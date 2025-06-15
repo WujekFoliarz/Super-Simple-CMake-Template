@@ -1,4 +1,7 @@
 #include "main.hpp"
+#if defined(_WIN32) || defined(_WIN64)
+#include <Windows.h>
+#endif
 
 #if COMPILE_TO_DLL == 0
 int main(int argc, char* argv[]) {
