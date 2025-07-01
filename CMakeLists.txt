@@ -1,5 +1,10 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
@@ -11,12 +16,20 @@ file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/sour
 
 set(COMPILE_TO_DLL OFF CACHE BOOL "Compile to dll" FORCE) # Delete the out folder when you change this
 
-if(COMPILE_TO_DLL)
-add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
-target_compile_definitions(${PROJECT_NAME} PUBLIC COMPILE_TO_DLL=1)
+if(ANDROID)
+    message(STATUS "Building for Android")
+    add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
+
+    find_library(log-lib log)
+    find_library(android-lib log)
+    target_link_libraries(${PROJECT_NAME} ${log-lib} ${android-lib})
 else()
-add_executable(${PROJECT_NAME} ${MY_SOURCES})
-target_compile_definitions(${PROJECT_NAME} PUBLIC COMPILE_TO_DLL=0)
+    if(COMPILE_TO_DLL)
+        add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
+        target_compile_definitions(${PROJECT_NAME} PUBLIC COMPILE_TO_DLL=1)
+    else()
+        add_executable(${PROJECT_NAME} ${MY_SOURCES})
+    endif()
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
