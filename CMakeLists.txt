@@ -27,17 +27,16 @@ if(ANDROID)
     find_library(android-lib log)
     target_link_libraries(${PROJECT_NAME} ${log-lib} ${android-lib})
 else()
-
-    # Windows/Linux only libraries
-    # add_subdirectory(thirdparty/) 
-    # target_link_libraries(${PROJECT_NAME} PRIVATE)
-
     if(COMPILE_TO_DLL)
         add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
         target_compile_definitions(${PROJECT_NAME} PUBLIC COMPILE_TO_DLL=1)
     else()
         add_executable(${PROJECT_NAME} ${MY_SOURCES})
     endif()
+    
+    # Windows/Linux only libraries
+    # add_subdirectory(thirdparty/) 
+    # target_link_libraries(${PROJECT_NAME} PRIVATE)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
