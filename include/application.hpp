@@ -3,6 +3,8 @@
 
 class Application {
 public:
+	Application();
+
 	enum class Platform {
 		Windows,
 		Linux,
@@ -10,19 +12,21 @@ public:
 		Unknown
 	};
 
-	inline Platform getPlatform() {
-	#if defined(_WIN32)
+	static Platform GetPlatform() {
+	#if defined(WINDOWS)
 		return Platform::Windows;
-	#elif defined(__linux__)
+	#elif defined(LINUX)
 		return Platform::Linux;
-	#elif defined(__ANDROID__)
+	#elif defined(ANDROID)
 		return Platform::Android;
 	#else
 		return Platform::Unknown;
 	#endif
 	}
 
-	bool run();
+	static Application* GetApplication();
+
+	bool Run();
 };
 
 

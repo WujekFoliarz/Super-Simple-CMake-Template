@@ -2,6 +2,16 @@
 #include <iostream>
 #include "log.hpp"
 
-bool Application::run() {
+inline Application* s_Application = nullptr;
+
+Application* Application::GetApplication() {
+	return s_Application;
+}
+
+Application::Application() {
+	s_Application = this;
+}
+
+bool Application::Run() {
 	return true;
 }

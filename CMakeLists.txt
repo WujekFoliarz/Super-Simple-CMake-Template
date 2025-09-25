@@ -14,22 +14,45 @@ endif()
 project (MyProject)
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
-set(COMPILE_TO_DLL OFF CACHE BOOL "Compile to dll" FORCE) # Delete the out folder when you change this
+set(COMPILE_TO_DLL OFF)
+set(PRODUCTION_BUILD OFF)
+
+# CROSS PLATFORM LIBRARIES
+# add_subdirectory(thirdparty/)
+
+# target_link_libraries(${PROJECT_NAME} PRIVATE )
 
 if(ANDROID)
     message(STATUS "Building for Android")
     add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
 
     find_library(log-lib log)
-    find_library(android-lib log)
-    target_link_libraries(${PROJECT_NAME} ${log-lib} ${android-lib})
+    find_library(android-lib android)
+    find_library(egl-lib EGL)
+    find_library(glesv2-lib GLESv2)
+    target_link_libraries(${PROJECT_NAME} ${log-lib} ${android-lib} ${egl-lib} ${glesv2-lib})
 else()
     if(COMPILE_TO_DLL)
         add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
         target_compile_definitions(${PROJECT_NAME} PUBLIC COMPILE_TO_DLL=1)
     else()
-        add_executable(${PROJECT_NAME} ${MY_SOURCES})
+        if(WIN32)
+            add_executable(${PROJECT_NAME} WIN32 ${MY_SOURCES})
+	        target_compile_definitions("${PROJECT_NAME}" PUBLIC WINDOWS=1) 
+        elseif(APPLE)
+	        add_executable(${PROJECT_NAME} ${MY_SOURCES})
+	        target_compile_definitions("${PROJECT_NAME}" PUBLIC APPLE=1)
+        elseif(UNIX)
+            add_executable(${PROJECT_NAME} ${MY_SOURCES})
+	        target_compile_definitions("${PROJECT_NAME}" PUBLIC LINUX=1)
+        endif()
     endif()
+
+    
+    # DESKTOP ONLY LIBRARIES
+    # add_subdirectory(thirdparty/)
+
+    # target_link_libraries(${PROJECT_NAME} PRIVATE )
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -38,12 +61,6 @@ target_include_directories(${PROJECT_NAME}
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/source"
 )
-
-# Subdirectiories
-# add_subdirectory(thirdparty/)
-
-# Linking libraries
-# target_link_libraries(${PROJECT_NAME} PRIVATE )
 
 # Copying DLLs to out folder
 # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:YourTarget> $<TARGET_FILE_DIR:${PROJECT_NAME}>)
