@@ -20,8 +20,6 @@ set(PRODUCTION_BUILD OFF)
 # CROSS PLATFORM LIBRARIES
 # add_subdirectory(thirdparty/)
 
-# target_link_libraries(${PROJECT_NAME} PRIVATE )
-
 if(ANDROID)
     message(STATUS "Building for Android")
     add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
