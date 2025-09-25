@@ -4,6 +4,7 @@
 class Application {
 public:
 	Application();
+	~Application();
 
 	enum class Platform {
 		Windows,

@@ -12,6 +12,9 @@ Application::Application() {
 	s_Application = this;
 }
 
+Application::~Application() {
+}
+
 bool Application::Run() {
 	return true;
 }
