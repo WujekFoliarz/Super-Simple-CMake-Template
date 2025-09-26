@@ -15,7 +15,8 @@ project (MyProject)
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
 set(COMPILE_TO_DLL OFF)
-set(PRODUCTION_BUILD OFF)
+set(PRODUCTION_BUILD ON)
+
 
 # CROSS PLATFORM LIBRARIES
 # add_subdirectory(thirdparty/)
@@ -32,17 +33,17 @@ if(ANDROID)
 else()
     if(COMPILE_TO_DLL)
         add_library(${PROJECT_NAME} SHARED ${MY_SOURCES})
-        target_compile_definitions(${PROJECT_NAME} PUBLIC COMPILE_TO_DLL=1)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE COMPILE_TO_DLL=1)
     else()
         if(WIN32)
             add_executable(${PROJECT_NAME} WIN32 ${MY_SOURCES})
-	        target_compile_definitions("${PROJECT_NAME}" PUBLIC WINDOWS=1) 
+	        target_compile_definitions("${PROJECT_NAME}" PRIVATE WINDOWS=1) 
         elseif(APPLE)
 	        add_executable(${PROJECT_NAME} ${MY_SOURCES})
-	        target_compile_definitions("${PROJECT_NAME}" PUBLIC APPLE=1)
+	        target_compile_definitions("${PROJECT_NAME}" PRIVATE APPLE=1)
         elseif(UNIX)
             add_executable(${PROJECT_NAME} ${MY_SOURCES})
-	        target_compile_definitions("${PROJECT_NAME}" PUBLIC LINUX=1)
+	        target_compile_definitions("${PROJECT_NAME}" PRIVATE LINUX=1)
         endif()
     endif()
 
@@ -51,6 +52,10 @@ else()
     # add_subdirectory(thirdparty/)
 
     # target_link_libraries(${PROJECT_NAME} PRIVATE )
+endif()
+
+if(PRODUCTION_BUILD)
+target_compile_definitions(${PROJECT_NAME} PRIVATE PRODUCTION_BUILD=1)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
